@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Tests for Event Delegation</title>
+	<link rel="stylesheet" href="../vendor/unittest.css" type="text/css" media="screen, projection" />
+
+	<script type="text/javascript" src='../vendor/prototype-1.6.1.js'></script>
+	<script type="text/javascript" src='../vendor/simulateEvent.js'></script>
+	<script type="text/javascript" src='../vendor/jsunittest.js'></script>
+
+	<script type="text/javascript" src='../src/delegate-generic.js'></script>
+	<script type="text/javascript" src='../src/delegate-prototype.js'></script>
+
+</head>
+
+<body>
+	<div id="testlog"> </div>
+
+	<div id="canvas" class="pretty">
+		<div id="content">
+			<form id="form_1" action="" method="get" accept-charset="utf-8">
+				<fieldset>
+					<p>
+						<label for="text_1">Text:</label>
+						<input type="text" id="text_1" name="text_1" value="" />
+					</p>
+					<p>
+						<label for="text_2">Text:</label>
+						<input type="text" id="text_2" name="text_2" value="" />
+					</p>
+					<p>
+						<label for="select_1">Select:</label>
+						<select id="select_1" name="select_1">
+							<option value="A">A</option>
+							<option value="B">B</option>
+							<option value="C">C</option>
+						</select>
+					</p>
+					<p>
+						<label for="select_2">Select:</label>
+						<select id="select_2" name="select_2">
+							<option value="A">A</option>
+							<option value="B">B</option>
+							<option value="C">C</option>
+						</select>
+					</p>
+					<p>
+						<input type="checkbox" name="checkbox_1" value="" id="checkbox_1">
+						<label for="checkbox_1">Checkbox</label>
+					</p>
+					<p>
+						<input type="radio" name="radio_1" value="" id="radio_1_1">
+						<label for="radio_1_1">Radio One</label>
+						<input type="radio" name="radio_1" value="" id="radio_1_2">
+						<label for="radio_1_2">Radio Two</label>
+					</p>
+					<p><input id="submit_1" type="submit" value="Submit" /></p>
+					<div id="clickMe" class="clickMe">Click on <strong>this text</strong></div>
+				</fieldset>
+			</form>
+			<form id="form_2" action="" method="get" accept-charset="utf-8">
+				<fieldset>
+					<p>
+						<label for="text_3">Text:</label>
+						<input type="text" id="text_3" name="text_3" value="" />
+					</p>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+
+	<!-- Tests -->
+	<script type="text/javascript">
+	// <![CDATA[
+	
+		new Test.Unit.Runner({
+		
+			testDelegateClick: function() { with(this) {
+				var handler = function(event) { clicked = true; };
+				$(document.body).delegate('click', '.clickMe', handler);
+				var clicked = false;
+				simulateEvent($('clickMe').down('strong'), 'click');
+				assert(clicked);
+
+				clicked = false;
+				simulateEvent($('text_3'), 'click');
+				assert(!clicked);
+				
+				$(document.body).stopDelegating('click', '.clickMe', handler);
+				var clicked = false;
+				simulateEvent($('clickMe').down('strong'), 'click');
+				assert(!clicked);
+
+				$(document.body).delegate('click', '.clickMe', handler);
+				$(document.body).stopDelegating('click', '.clickMe');
+				simulateEvent($('clickMe').down('strong'), 'click');
+				assert(!clicked);
+
+				$(document.body).delegate('click', '.clickMe', handler);
+				$(document.body).stopDelegating('click', '.clickMe');
+				simulateEvent($('clickMe').down('strong'), 'click');
+				assert(!clicked);
+			}},
+			
+			testDelegateChange: function() { with(this) {
+				var changed = false;
+				var handler = function (event) {
+					changed = true;
+				};
+				$('content').delegate('change', '[name="select_1"]', handler);
+				$('select_1').focus();
+				$('select_1').value = 'B';
+				simulateEvent($('select_1'), 'change');
+				assert(changed);
+				changed = false;
+				$('select_2').focus();
+				$('select_2').value = 'C';
+				simulateEvent($('select_2'), 'change');
+				assert(!changed);
+				var delegating = $('content')._delegates;
+				$('content').stopDelegating('change', '[name="select_1"]', handler);
+				$('select_1').focus();
+				$('select_1').value = 'B';
+				simulateEvent($('select_1'), 'change');
+				assert(!changed);
+			
+			}},
+			
+			testDelegateFocus: function() { with(this) {
+				var gotFocus = false;
+				var target = undefined;
+				var handler = function(event) {
+					target = event.element();
+					gotFocus = true;
+				};
+				$('content').delegate('focus', '[name="text_1"]', handler);
+				$('text_1').focus();
+				assert(gotFocus);
+				assert(target.tagName === 'INPUT');
+				gotFocus = false;
+				$('text_2').focus();
+				assert(!gotFocus);
+				var delegating = $('content')._delegates;
+				$('content').stopDelegating('focus', '[name="text_1"]', handler);
+				$('text_1').focus();
+				assert(!gotFocus);
+			}},
+			
+			testDelegateSubmit: function() { with(this) {
+				$('form_1').observe('submit', function(event) {
+					if (!wasSubmitted)
+						event.stop();
+				});
+				var wasSubmitted = false;
+				var handler = function(event) {
+					event.stop();
+					wasSubmitted = true;
+				};
+				$('content').delegate('submit', 'form', handler);
+				$('submit_1').focus();
+				$('submit_1').click();
+				assert(wasSubmitted);
+				
+				$('text_3').focus();
+				wasSubmitted = false;
+				$('content').stopDelegating('submit', 'form', handler);
+				$('submit_1').focus();
+				$('submit_1').click();
+				assert(!wasSubmitted);
+				
+				$('text_1').focus();
+				$('content').delegate('submit', 'form', handler);
+				$('submit_1').focus();
+				$('submit_1').click();
+				assert(wasSubmitted);
+				
+			}},
+
+			testHandlerStorage: function() { with(this) {
+
+				var handler1 = function(a1) {};
+				var internalHandler1 = function(ia1) {};
+				var handler2 = function(a2) {};
+				var internalHandler2 = function(ia2) {};
+
+				HandlerStorage.push(document.body, 'click', '.myClass', handler1, internalHandler1);
+				HandlerStorage.push(document.body, 'click', '.myClass', handler2, internalHandler2);
+				assertEqual(2, document.body._delegates['click']['.myClass'].length);
+				
+				HandlerStorage.push(document.body, 'click', '.myOtherClass', handler2, internalHandler2);
+				assertEqual(1, document.body._delegates['click']['.myOtherClass'].length);
+				
+				HandlerStorage.pop(document.body, 'click', '.myClass', handler1);
+				assertEqual(1, document.body._delegates['click']['.myClass'].length)
+
+				HandlerStorage.pop(document.body, 'click', '.myClass', handler2);
+				assertIdentical(undefined, document.body._delegates['click']['.myClass']);
+
+				HandlerStorage.pop(document.body, 'click', '.myOtherClass', handler2);
+				assertIdentical(undefined, document.body._delegates['click']);
+
+			}}
+
+		});
+	// ]]>
+
+	</script>
+
+</body>
+</html>
