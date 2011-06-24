@@ -13,6 +13,7 @@ To use delegatejs with mootools include:
 
 Now you can do event delegation in the following way:
 
+```html
 <html>
 	<head>
 		<title>Event Delegation with Prototype</title>
@@ -37,6 +38,7 @@ Now you can do event delegation in the following way:
 		</div>
 	</body>
 </html>
+```
 
 delegatejs works for submit, change, focus and blur event - as well as all bubbling events.
 
