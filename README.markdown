@@ -1,15 +1,18 @@
 To use delegatejs with prototype include:
 
-	<script type="text/javascript" src='delegate-generic.js'></script>
-	<script type="text/javascript" src='delegate-prototype.js'></script>
+```html
+<script type="text/javascript" src='delegate-generic.js'></script>
+<script type="text/javascript" src='delegate-prototype.js'></script>
+```
 
 in you HTML.
 
 To use delegatejs with mootools include:
 
-	<script type="text/javascript" src='delegate-generic.js'></script>
-	<script type="text/javascript" src='delegate-mootools.js'></script>
-
+```html
+<script type="text/javascript" src='delegate-generic.js'></script>
+<script type="text/javascript" src='delegate-mootools.js'></script>
+```
 
 Now you can do event delegation in the following way:
 
