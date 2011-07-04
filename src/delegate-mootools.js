@@ -1,5 +1,5 @@
 (function() {
-	var matcher = function(element, selector){return element.match(selector);};
+	var matcher = function(element, selector){ return Element.Prototype.match.call(element, selector); };
 	var extender = function(event) { return new Event(event);};
 	var methods = DelegateGeneric(matcher, extender);
 	Element.implement({delegate: function(eventType, selector, handler){ methods.delegate(this, eventType, selector, handler)}});

@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Tests for Event Delegation</title>
-	<link rel="stylesheet" href="../vendor/unittest.css" type="text/css" media="screen, projection" />
+	<link rel="stylesheet" href="../vendor/unittest.css" />
 
 	<script type="text/javascript" src='../vendor/prototype-1.6.1.js'></script>
 	<script type="text/javascript" src='../vendor/simulateEvent.js'></script>
@@ -82,26 +82,17 @@
 				$(document.body).delegate('click', '.clickMe', handler);
 				var clicked = false;
 				simulateEvent($('clickMe').down('strong'), 'click');
-				assert(clicked);
+				assert(clicked, "Clicking nested tag should propagate");
 
 				clicked = false;
 				simulateEvent($('text_3'), 'click');
-				assert(!clicked);
+				assert(!clicked, "Clicking non-containing tag should not propagate");
 				
 				$(document.body).stopDelegating('click', '.clickMe', handler);
 				var clicked = false;
 				simulateEvent($('clickMe').down('strong'), 'click');
 				assert(!clicked);
 
-				$(document.body).delegate('click', '.clickMe', handler);
-				$(document.body).stopDelegating('click', '.clickMe');
-				simulateEvent($('clickMe').down('strong'), 'click');
-				assert(!clicked);
-
-				$(document.body).delegate('click', '.clickMe', handler);
-				$(document.body).stopDelegating('click', '.clickMe');
-				simulateEvent($('clickMe').down('strong'), 'click');
-				assert(!clicked);
 			}},
 			
 			testDelegateChange: function() { with(this) {
