@@ -24,9 +24,11 @@ Now you can do event delegation in the following way:
 		<script type="text/javascript" src='delegate-generic.js'></script>
 		<script type="text/javascript" src='delegate-prototype.js'></script>
 		<script type="text/javascript">
-			$('someDIV').delegate('submit', '.dont-submit', function(event){
-				event.stop();
-				alert('The form was not submitted!');
+			document.observe('dom:loaded', function() {
+				$('someDIV').delegate('submit', '.dont-submit', function(event){
+					event.stop();
+					alert('The form was not submitted!');
+				});
 			});
 		</script>
 	</head>
@@ -45,4 +47,4 @@ Now you can do event delegation in the following way:
 
 delegatejs works for submit, change, focus and blur event - as well as all bubbling events.
 
-Please check out the tests for more examples!
+Please check out the tests for more examples, or read my [blog entry](http://www.dreamchain.com/event-delegation-with-prototype-and-mootools/).
